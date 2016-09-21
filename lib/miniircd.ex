@@ -1,0 +1,2 @@
+defmodule MiniIrcd do
+end
