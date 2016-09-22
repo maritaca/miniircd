@@ -7,4 +7,14 @@ miniircd is a small and limited IRC server written in Elixir. It's a prototype s
 ## Features
 
 - [ ] Knows about the basic IRC protocol and commands.
+    - [ ] CAP
+    - [ ] NICK
+    - [ ] USER
+    - [ ] MOD
+    - [ ] PING
+    - [ ] QUIT
+    - [ ] JOIN
+    - [ ] WHO
+    - [ ] PRIVMSG
+    - [X] LEAVE
 - [ ] Basic SSL support.
