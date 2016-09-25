@@ -18,7 +18,11 @@ defmodule MiniIrcd.Client do
         GenServer.stop(self, :normal)
         IO.inspect(:exit)
       res when is_list(res) ->
-        res |> Enum.each(fn (r) -> Socket.Stream.send(client, r <> "\r\n") end)
+        res = res
+              |> Enum.map(&(&1 <> "\r\n"))
+              |> Enum.join
+        client
+        |> Socket.Stream.send(res)
         IO.inspect res
       oth ->
         IO.inspect(oth)
@@ -38,6 +42,7 @@ defmodule MiniIrcd.Client do
   def parse_request(["USER" | _tail]) do
     [
       ":miniircd.local 001 milad :Hi, welcome to IRC",
+      ":miniircd.local 001 milad :.. enjoy your stay :P",
     ]
   end
 
