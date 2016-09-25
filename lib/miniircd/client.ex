@@ -7,33 +7,27 @@ defmodule MiniIrcd.Client do
   end
 
   def init([client]) do
-    {:ok, %{client: client}, 0}
+    {:ok, %{client: client}}
   end
 
-  def handle_info(:timeout, %{client: client} = state) do
-    #Logger.debug "#{inspect __MODULE__} waiting for a line"
-    #Maybe even better to create two Processes to handle read and write separately
-    #then we can wait for packet infinity and don't use the resource with the loop
-    case Socket.Stream.recv(client, [timeout: 10000]) do
-      {:error, :ebadf} ->
+  def handle_info({:tcp, client, line}, %{client: client} = state) do
+    Socket.TCP.options(client, mode: :once)
+    IO.inspect line
+    case parse_request(line) do
+      :exit ->
         GenServer.stop(self, :normal)
-        {:noreply, state}
-      {:error, :timeout} ->
-        {:noreply, state, 0}
-      {:ok, line} ->
-      IO.inspect line
-      case parse_request(line) do
-        :exit ->
-          GenServer.stop(self, :normal)
-          IO.inspect(:exit)
-        res when is_list(res) ->
-          res |> Enum.each(fn (r) -> Socket.Stream.send(client, r <> "\r\n") end)
-          IO.inspect res
-        oth ->
-          IO.inspect(oth)
-      end
-      {:noreply, state, 0}
+        IO.inspect(:exit)
+      res when is_list(res) ->
+        res |> Enum.each(fn (r) -> Socket.Stream.send(client, r <> "\r\n") end)
+        IO.inspect res
+      oth ->
+        IO.inspect(oth)
     end
+    {:noreply, state}
+  end
+
+  def handle_info({:tcp_closed, client}, %{client: client} = state) do
+    {:stop, :normal, state}
   end
 
   def parse_request(nil), do: nil

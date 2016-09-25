@@ -13,7 +13,7 @@ defmodule MiniIrcd.Server do
 
   def handle_info(:timeout, %{server: server} = state) do
     Logger.debug "accepting connection"
-    client = server |> Socket.TCP.accept!
+    client = server |> Socket.TCP.accept!(mode: :once)
     Logger.debug "client joined"
     #TODO: supervise this pid
     {:ok, client_pid} = MiniIrcd.Client.start(client)
