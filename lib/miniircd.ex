@@ -8,9 +8,8 @@ defmodule MiniIrcd do
 
     # Define workers and child supervisors to be supervised
     children = [
-      # Start the Ecto repository
-      supervisor(MiniIrcd.Server, []),
-      # Start the endpoint when the application starts
+      worker(MiniIrcd.Server, []),
+      supervisor(MiniIrcd.Client.Supervisor, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

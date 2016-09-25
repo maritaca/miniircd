@@ -3,7 +3,11 @@ defmodule MiniIrcd.Client do
   require Logger
 
   def start(client) do
-    GenServer.start(__MODULE__, [client], [])
+    Supervisor.start_child MiniIrcd.Client.Supervisor, [client]
+  end
+
+  def start_link(client) do
+    GenServer.start_link(__MODULE__, [client], [])
   end
 
   def init([client]) do
