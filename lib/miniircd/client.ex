@@ -15,8 +15,8 @@ defmodule MiniIrcd.Client do
     IO.inspect line
     case parse_request(line) do
       :exit ->
-        GenServer.stop(self, :normal)
         IO.inspect(:exit)
+        {:stop, :normal, state}
       res when is_list(res) ->
         res = res
               |> Enum.map(&(&1 <> "\r\n"))
@@ -24,10 +24,11 @@ defmodule MiniIrcd.Client do
         client
         |> Socket.Stream.send(res)
         IO.inspect res
+        {:noreply, state}
       oth ->
         IO.inspect(oth)
+        {:noreply, state}
     end
-    {:noreply, state}
   end
 
   def handle_info({:tcp_closed, client}, %{client: client} = state) do
